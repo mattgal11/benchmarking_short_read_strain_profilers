@@ -1,0 +1,8 @@
+name: pathoscope
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pathoscope
+  - python=2.7

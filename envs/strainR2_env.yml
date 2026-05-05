@@ -1,0 +1,8 @@
+name: strainr2
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - strainr2
+  - bbmap=39.26

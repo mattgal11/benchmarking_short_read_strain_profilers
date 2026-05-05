@@ -1,0 +1,9 @@
+name: insilicoseq
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - insilicoseq
+  - python=3.9
+prefix: /well/bag/users/wfr051/.conda/envs/insilicoseq
