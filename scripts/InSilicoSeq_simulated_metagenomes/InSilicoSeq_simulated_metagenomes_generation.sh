@@ -2,8 +2,8 @@
 
 # This SLURM-scheduled script will simulate the 5 abundance ratios metagenomes using InSilicoSeq v2.0.1, across 3 depths and in triplicate
 # See Methods for further information.
-# Table S4 contains normalised per-contig relative abundances for 98 species assemblies used to construct the baseline gut microbiome profile.
-# Table S5 contains the final InSilicoSeq setup for metagenome simulation, including strain abundances and depth of coverage.
+# FigShare Data Summary contains normalised per-contig relative abundances for 98 species assemblies used to construct the baseline gut microbiome profile.
+# Table S4 contains the final InSilicoSeq setup for metagenome simulation, including strain abundances and depth of coverage.
 # See Data Summary for .txt --abundance_file(s)
 
 #SBATCH --job-name=InSilicoSeq_simulated_metagenomes
