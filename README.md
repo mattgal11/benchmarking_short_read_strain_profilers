@@ -2,9 +2,21 @@
 
 ## Summary
 
-This repository contains the scripts from the Data Summary used for benchmarking short-read strain-level profiling tools (PanTax, PathoScope, StrainGE, Strainify, StrainR2 and StrainScan (including super low depth mode)). Other supplementary data is available on the associated FigShare link from the paper ().
+This repository contains the scripts from the Data Summary used for the benchmarking of short-read strain-level profiling tools (PanTax, PathoScope, StrainGE, Strainify, StrainR2 and StrainScan (including super low depth mode)) on _Escherichia coli_. Reproducibility requirements for each tool are also provided. Other supplementary data is available on the associated FigShare link from the paper ().
 
 ## Structure
 
-- `scripts/InSilicoSeq_simulated_metagenomes` - contains scripts and associated files for simulating metagenomes using InSilicoSeq.
-- `scripts/SLURM_jobs_simulated_metagenomes` - contains per-tool scripts from the simulated metagenomes for job submissions on SLURM clusters. Note PanTax has a script included here for completeness but this is not a SLURM job script, rather a file-driven batch processing loop. Note that PathoScope has two scripts, one per core module used (MAP & ID), which should be run sequentially.
+- `envs/` - human-readable conda environment files used to define each tool’s (including InsilicoSeq) dependencies.
+- `locks/` - fully reproducible conda-lock files for exact environment recreation.
+  - Example usage:
+    - `conda create -n <env_name> --file locks/<env_name>-linux-64.lock`
+    - `conda activate <env_name>`
+  - Notes:
+    -  Strainify (v1.1.0) was installed from the upstream repository (https://github.com/treangenlab/Strainify). A `conda-lock` file could not be generated due to dependency resolution issues
+    -  PanTax requires `Gurobi` (v11), which is not included in the lockfile because it requires a user-specific license.
+- `scripts/`
+  - `InSilicoSeq_simulated_metagenomes/` - contains scripts and associated files (including abundance files) for simulating metagenomes using InSilicoSeq.
+  - `SLURM_jobs_simulated_metagenomes/` - contains per-tool scripts from the simulated metagenomes for job submissions on SLURM clusters.
+    - PanTax has a script included but this is not a SLURM job script, rather a file-driven batch processing loop.
+    - PathoScope has two scripts, one per core module used (MAP & ID), which should be run sequentially.
+  - `R_visualizations_and_stats/` - contains full per-figure scripts to recreate R visualizations and any associated statistical analysis. See FigShare repository for the input data files required to reproduce these figures.
