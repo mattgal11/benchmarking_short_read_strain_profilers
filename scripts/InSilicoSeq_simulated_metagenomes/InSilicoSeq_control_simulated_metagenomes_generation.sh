@@ -3,7 +3,7 @@
 # This SLURM-scheduled script will simulate the control metagenomes (no K12-MG1655 or O157:H7 str. Sakai) using InSilicoSeq v2.0.1, in triplicate
 # See Methods for further information.
 # FigShare Data Summary contains normalised per-contig relative abundances for species assemblies used to construct the baseline gut microbiome profile.
-# Table S4 contains the final InSilicoSeq setup for metagenome simulation, including strain abundances and depth of coverage.
+# Table S4 contains the final InSilicoSeq setup for metagenome simulation, including strain abundances.
 # See Data Summary for .txt --abundance_file (control = baseline community with target strains removed (see Methods))
 
 #SBATCH --job-name=InSilicoSeq_simulated_metagenomes_control
@@ -20,14 +20,14 @@
 source /path/to/conda.sh
 conda activate insilicoseq
 
-# ---------------- CONFIG ------------------------------------------------------------------------------------------------------------------------
+# ---------------- CONFIG -------------------------------------------------------------------------------------------------------------------------------------------------------------
 REPS=3  # rep1..rep3 (seeds 1,2,3)
 N_READS_ARRAY=(40000000 100000000 200000000)  # depths expressed as total single reads (InSilicoSeq --n_reads)
 PAIR_LABELS=(20 50 100)   # paired-read million-labels corresponding to N_READS_ARRAY (40M -> 20M pairs -> label 20)
-GENOMES_DIR="/path/to/genomes_directory" # should contain assemblies detailed in Table S4, excluding K12-MG1655 and O157:H7 Sakai E. coli strains
+GENOMES_DIR="/path/to/genomes_directory" # should contain assemblies detailed in Table S4, excluding K12-MG1655 and O157:H7 Sakai E. coli strains. Genomes can be downloaded from NCBI.
 OUTDIR="/path/to/simulated_metagenomes" # where we will store our simulated metagenomes that are generated
 ABUND_PATH="abundance_files/control.txt"   # single control abundance file (provided; see Data Summary)
-# ------------------------------------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Make directories if they do not already exist
 mkdir -p logs
@@ -69,7 +69,7 @@ export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 
-# Run InSilicoSeq using the chosen parameters (see Methods; Table S5)
+# Run InSilicoSeq using the chosen parameters (see Methods; Table S4)
 iss generate \
   --model hiseq \
   --genomes "$GENOMES_DIR"/*.fna \
