@@ -9,7 +9,7 @@
 #SBATCH --job-name=InSilicoSeq_simulated_metagenomes_control
 #SBATCH --output=logs/iss_control_%A_%a.out
 #SBATCH --error=logs/iss_control_%A_%a.err
-#SBATCH --time=12:00:00
+#SBATCH --time=16:00:00
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH -p short
