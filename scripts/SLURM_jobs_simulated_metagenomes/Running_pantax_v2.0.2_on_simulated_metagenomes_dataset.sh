@@ -12,21 +12,24 @@ mkdir -p pantax_v.2.0.2_simulated_metagenomes_dataset
 mkdir -p pantax_v.2.0.2_simulated_metagenomes_dataset/logs
 
 while IFS= read -r SAMPLE; do
+  SAMPLE_ID=$(basename "${SAMPLE}")
+
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running ${SAMPLE}"
+
   pantax -f genomes_info.txt -s -p \
     -r "${SAMPLE}_R1.fastq.gz" \
     -r "${SAMPLE}_R2.fastq.gz" \
     -db pantax_db --species --strain \
-    --output "pantax_v.2.0.2_simulated_metagenomes_dataset/${SAMPLE}" \
-    > "pantax_v.2.0.2_simulated_metagenomes_dataset/logs/${SAMPLE}.log" 2>&1
-done < simulated_metagenomes.txt
-# ^^simulated_metagenomes.txt (provided - see Data Summary) should contain one entry per line, including the relative path to the sample (without _R1/_R2 suffix), e.g., final_metagenomes/HiSeq_20M_K12_50_Sakai_50_rep1
+    --output "pantax_v.2.0.2_simulated_metagenomes_dataset/${SAMPLE_ID}" \
+    > "pantax_v.2.0.2_simulated_metagenomes_dataset/logs/${SAMPLE_ID}.log" 2>&1
 
-# To extract the predicted abundance results run the following in the results directory:
+done < simulated_metagenomes.txt # simulated_metagenomes.txt (provided - see Data Summary) should contain one entry per line, including the relative path to the sample (without _R1/_R2 suffix), e.g., final_metagenomes/HiSeq_20M_K12_50_Sakai_50_rep1
+
+# Extract predicted abundance results per run:
 echo -e "sampleID\tgenome_ID\tpredicted_abundance" > all_samples_abundance.txt
 
-for f in *_strain_abundance.txt; do
-    sample=${f%_strain_abundance.txt}
+find pantax_v.2.0.2_simulated_metagenomes_dataset -type f -name '*_strain_abundance.txt' | sort | while IFS= read -r f; do
+    sample=$(basename "${f}" _strain_abundance.txt)
     awk -v s="$sample" 'NR>1 {print s"\t"$3"\t"$5}' "$f" >> all_samples_abundance.txt
 done
 
