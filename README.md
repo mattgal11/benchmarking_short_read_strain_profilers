@@ -2,7 +2,7 @@
 
 ## Summary
 
-This repository contains the scripts from the Data Summary used for the benchmarking of short-read strain-level profiling tools (PanTax, PathoScope, StrainGE, Strainify, StrainR2 and StrainScan) on _Escherichia coli_. Reproducibility requirements for each tool are also provided. Supplementary data is available on the associated FigShare link from the paper ().
+This repository contains the scripts from the Data Summary used for the benchmarking of short-read strain-level profiling tools (PanTax, PathoScope, StrainGE, Strainify, StrainR2 and StrainScan) on _Escherichia coli_. Reproducibility requirements for each tool are also provided. Supplementary data is available on the associated FigShare link from the paper (https://doi.org/10.6084/m9.figshare.32125474).
 
 ## Structure
 
