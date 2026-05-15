@@ -1,3 +1,5 @@
+# This script extracts strainGE results and normalises them (rapct/total_rapct; see Methods)
+
 #!/usr/bin/env bash
 set -euo pipefail
 
