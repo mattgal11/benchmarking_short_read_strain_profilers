@@ -21,3 +21,7 @@ This repository contains the scripts from the Data Summary used for the benchmar
     - PanTax has a script included but this is not a SLURM job script, rather a file-driven batch processing loop.
     - PathoScope has two scripts, one per core module used (MAP & ID), which should be run sequentially.
     - StrainGE has an additional extraction/normalisation script to process the results.
+
+## Preprint
+
+Now available on BioRxiv, see https://doi.org/10.64898/2026.05.19.726160
