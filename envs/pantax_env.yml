@@ -1,7 +1,11 @@
-name: pantaxv2
+name: pantax_v2.1.0
 channels:
+  - https://conda.anaconda.org/gurobi
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - pantax
+  - glpk=5.0
+  - pantax=2.1.0
+  - python=3.10
+  - gurobi=11
