@@ -6,14 +6,13 @@ This repository contains the scripts from the Data Summary used for the benchmar
 
 ## Structure
 
-- `envs/` - human-readable conda environment files used to define each tool’s dependencies. This includes InsilicoSeq, used for simulating metagenomes.
+- `envs/` - human-readable conda environment files used to define each tool’s dependencies. This includes InsilicoSeq, used for generating the simulated gut metagenomes and real-world spike-ins datasets.
 - `locks/` - fully reproducible conda-lock files for exact environment recreation.
   - Example usage:
-    - `conda create -n <env_name> --file locks/<env_name>-linux-64.lock`
+    - `conda-lock install -n <env_name> locks/<env_name>_conda_lock.yml`
     - `conda activate <env_name>`
   - Notes:
-    -  Strainify (v1.1.0) was installed from the upstream repository (https://github.com/treangenlab/Strainify). A `conda-lock` file could not be generated due to dependency resolution issues
-    -  PanTax requires `Gurobi` (v11), which is not included in the lockfile because it requires a user-specific license.
+    -  PanTax requires Gurobi (v11). Gurobi is included in the lock file, but users must obtain and configure an appropriate Gurobi licence separately (see: https://www.gurobi.com/academics).
 - `scripts/`
   - `InSilicoSeq_simulated_metagenomes/` - contains scripts and associated files (including abundance files) for simulating metagenomes using InSilicoSeq.
   - `R_visualizations_and_stats/` - contains scripts to recreate R visualizations and any associated statistical analysis used for figures in the manuscript. R scripts are grouped by results narrative - e.g., Fig. 1 and Fig. S1 are presented together. See FigShare repository for the required input data files.
