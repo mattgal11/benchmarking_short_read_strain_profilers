@@ -17,9 +17,10 @@ This repository contains the scripts from the Data Summary used for the benchmar
   - `InSilicoSeq_simulated_metagenomes/` - contains scripts and associated files (including abundance files) for simulating metagenomes using InSilicoSeq.
   - `R_visualizations_and_stats/` - contains scripts to recreate R visualizations and any associated statistical analysis used for figures in the manuscript. R scripts are grouped by results narrative - e.g., Fig. 1 and Fig. S1 are presented together. See FigShare repository for the required input data files.
   - `SLURM_jobs_simulated_metagenomes/` - contains per-tool scripts from the simulated metagenomes for job submissions on SLURM clusters.
-    - PanTax has a script included but this is not a SLURM job script, rather a file-driven batch processing loop.
+    - The PanTax script is a file-driven batch processing loop due to Gurobi network requirements.
     - PathoScope has two scripts, one per core module used (MAP & ID), which should be run sequentially.
     - StrainGE has an additional extraction/normalisation script to process the results.
+  - `real_world_spike_ins_metagenomes/` - contains per-tool scripts from the real-world spike-ins final benchmarking dataset for DB building, metagenome profiling and computational benchmarking.
 
 ## Preprint
 
