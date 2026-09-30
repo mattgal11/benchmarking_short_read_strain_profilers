@@ -15,12 +15,13 @@ This repository contains the scripts from the Data Summary used for the benchmar
     -  PanTax requires Gurobi (v11). Gurobi is included in the lock file, but users must obtain and configure an appropriate Gurobi licence separately (see: https://www.gurobi.com/academics).
 - `scripts/`
   - `InSilicoSeq_simulated_metagenomes/` - contains scripts and associated files (including abundance files) for simulating metagenomes using InSilicoSeq.
-  - `R_visualizations_and_stats/` - contains scripts to recreate R visualizations and any associated statistical analysis used for figures in the manuscript. R scripts are grouped by results narrative - e.g., Fig. 1 and Fig. S1 are presented together. See FigShare repository for the required input data files.
   - `SLURM_jobs_simulated_metagenomes/` - contains per-tool scripts from the simulated metagenomes for job submissions on SLURM clusters.
     - The PanTax script is a file-driven batch processing loop due to Gurobi network requirements.
     - PathoScope has two scripts, one per core module used (MAP & ID), which should be run sequentially.
     - StrainGE has an additional extraction/normalisation script to process the results.
+  - `InSilicoSeq_real_world_spike_ins` - contains scripts and associated files for simulating _E. coli_ reads from 10 strains for the real world spike ins metagenomic dataset. Also includes a script to run Kraken2 on metagenome samples (before and after _E. coli_ read removal), alongside a concatenation script for spiking in the InSilicoSeq-generated 10-strain _E.coli_ reads into the cleaned metagenomes.
   - `real_world_spike_ins_metagenomes/` - contains per-tool scripts from the real-world spike-ins final benchmarking dataset for DB building, metagenome profiling and computational benchmarking.
+  - `R_visualizations_and_stats/` - contains scripts to recreate R visualizations and any associated statistical analysis used for figures in the manuscript. R scripts are grouped by results narrative - e.g., Fig. 1 and Fig. S1 are presented together. See FigShare repository for the required input data files.
 
 ## Preprint
 
