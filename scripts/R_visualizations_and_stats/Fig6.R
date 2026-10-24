@@ -708,66 +708,59 @@ library(ggplot2)
 
 # Need to wrap the radar plot as a ggplot object first otherwise cowplot will not work
 radar_ggplot <- as.ggplot(~{
-#op <- par(
-#  mfrow = c(4, 2),
-#  mar = c(0.2, 3.5, 0.2, 2),
-#  oma = c(0, 0, 3, 0))
-
-op <- par(
-  mfrow = c(4, 2),
-  mar = c(0, 0.5, 0, 0.5),
-  oma = c(0, 0, 0, 0))
-
-for (i in 3:nrow(radar_df)) {
   
-  tool_name <- rownames(radar_df)[i]
-  tool_colour <- tool_colours[tool_name]
+  op <- par(
+    mfrow = c(4, 2),
+    mar = c(0.8, 0.8, 0.8, 0.8),
+    oma = c(0, 0, 0, 0),
+    pty = "s"
+  )
   
-  par(
-    plt = c(0.05, 0.95, 0.10, 0.90))
+  par(xaxs = "i", yaxs = "i")
+  on.exit(par(op), add = TRUE)
   
-  radarchart(
-    radar_df[c(1, 2, i), ],
-    axistype = 1,
-    seg = 4,
+  for (i in 3:nrow(radar_df)) {
     
-    pcol = tool_colour,
-    pfcol = scales::alpha(
-      tool_colour,
-      0.5),
+    tool_name <- rownames(radar_df)[i]
+    tool_colour <- tool_colours[tool_name]
     
-    plwd = 1.8,
-    plty = 1,
+    radarchart(
+      radar_df[c(1, 2, i), ],
+      axistype = 1,
+      seg = 4,
+      pcol = tool_colour,
+      pfcol = scales::alpha(tool_colour, 0.5),
+      plwd = 1.8,
+      plty = 1,
+      cglcol = "grey90",
+      cglty = 1,
+      cglwd = 0.8,
+      axislabcol = "grey40",
+      vlcex = 0.9,
+      caxislabels = caxislabels,
+      vlabels = c("sensitivity", "", "precision", "F1"),
+      title = ""
+    )
     
-    cglcol = "grey90",
-    cglty = 1,
-    cglwd = 0.8,
+    text(
+      x = -2, y = 0.85,
+      labels = paste(strwrap(tool_name, width = 15),
+                     collapse = "\n"),
+      xpd = NA,
+      adj = c(0, 0.5),
+      cex = 1.0,
+      font = 2
+    )
     
-    axislabcol = "grey40",
-    
-    vlcex = 1.0,
-    
-    caxislabels = caxislabels,
-    
-    vlabels = c(
-      "sensitivity", "", "precision", "F1"),
-    
-    title = "")
-  
-  text(
-    x = 0, y = 1.5,
-    labels = tool_name,
-    xpd = NA, cex = 1.2, font = 2)
-  
-  text(
-    x = -1.05, y = 0,
-    labels = "specificity",
-    xpd = NA,
-    adj = c(1, 0.5),
-    cex = 1.0)
-    }
+    text(
+      x = -1.08, y = 0,
+      labels = "specificity",
+      xpd = NA,
+      adj = c(1, 0.5),
+      cex = 0.85
+    )
   }
-)
+})
 
 print(radar_ggplot)
 
