@@ -1,6 +1,10 @@
 # ============================================================
-# Fig. 7: Predicted E. coli strain relative abundance across 
-# 42 real-world metagenomes with identical 10-strain spike-in
+# Fig. 7: Predicted E. coli strain relative abundance and
+# absolute proportional error across42 real-world metagenomes 
+# with identical 10-strain spike-in
+# And
+# Fig.S5: Predicted relative abundance across increasing
+# StrainGE iterations
 # ============================================================
 
 # ============================================================
@@ -192,7 +196,7 @@ p_final_benchmark_stacked <- ggplot(plot_data,
         predicted_relative_abundance >= 0.1,
         sprintf("%.2f", predicted_relative_abundance), "")),
        position = position_stack(vjust = 0.5),
-       size = 2.5, color = "white", fontface = "bold", angle = 0, na.rm = TRUE) +
+       size = 2.25, color = "white", fontface = "bold", angle = 0, na.rm = TRUE) +
   facet_grid(rows = vars(strain_profiling_tool),
     scales = "fixed",
     labeller = labeller(
@@ -463,4 +467,339 @@ p7a <- p_final_benchmark_stacked_with_truth
 p7b <- p_final_benchmark_mean_APE_bar
 
 plot_grid(p7a, p7b, labels = c("(a)", "(b)"), ncol = 2, rel_widths = c(2.75, 1))
-ggsave("combined_Fig7.pdf", width = 16, height = 10)
+ggsave("Fig7.pdf", width = 16, height = 10)
+
+
+#############################################################
+
+
+# ============================================================
+# Fig.S5: StrainGE predicted E. coli strain relative abundance
+# across 42 spiked metagenomes, faceted by StrainGE iterations
+# Much of this script repeats the code above, but with the 
+# StrainGE iterations as the facet variable
+# ============================================================
+
+# ------------------------------------------------------------
+# 1. (Re)load libraries
+# ------------------------------------------------------------
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(readxl)
+library(grid)
+library(ggtext)
+library(cowplot)
+
+# ------------------------------------------------------------
+# 2. Load StrainGE benchmarking dataset
+# ------------------------------------------------------------
+master <- read.csv("real_world_spike_ins_strainGE_iterations_test") # <-- Available on FigShare
+
+# Check iteration settings
+master %>%
+  count(strainGE_iterations)
+
+# ------------------------------------------------------------
+# 3. Define the 10 true spiked strains
+# ------------------------------------------------------------
+spiked_strains <- c(
+  "GCA_000493595" = "PMV-1",
+  "GCA_000025745" = "IHE3034",
+  "GCA_001280345" = "SF-468",
+  "GCA_001900395" = "D8",
+  "GCA_002863845" = "STEC299",
+  "GCA_002996945" = "AR_0081",
+  "GCA_002812545" = "SC516",
+  "GCA_003073815" = "AR437",
+  "GCA_000245515" = "RM12579",
+  "GCA_002948655" = "AR_0077"
+)
+
+# ------------------------------------------------------------
+# 4. Define true relative abundances
+# ------------------------------------------------------------
+true_abundances <- c(
+  "PMV-1"   = 0.10,
+  "IHE3034" = 0.10,
+  "SF-468"  = 0.10,
+  "D8"      = 0.10,
+  "STEC299" = 0.10,
+  "AR_0081" = 0.20,
+  "SC516"   = 0.12,
+  "AR437"   = 0.08,
+  "RM12579" = 0.06,
+  "AR_0077" = 0.04
+)
+
+# ------------------------------------------------------------
+# 5. Prepare master dataset
+# ------------------------------------------------------------
+master2 <- master %>%
+  mutate(
+    predicted_abundance = as.numeric(predicted_abundance),
+    
+    strain_category = case_when(
+      strain_id %in% names(spiked_strains) ~
+        unname(spiked_strains[strain_id]),
+      TRUE ~ "Other"
+    )
+  )
+
+# ------------------------------------------------------------
+# 6. Collapse predicted abundance into strain categories
+# IMPORTANT: Include strainGE_iterations in grouping
+# ------------------------------------------------------------
+plot_data <- master2 %>%
+  group_by(
+    strainGE_iterations,
+    sample_id,
+    strain_category
+  ) %>%
+  summarise(
+    predicted_relative_abundance = if (
+      all(is.na(predicted_abundance))
+    ) {
+      NA_real_
+    } else {
+      sum(predicted_abundance, na.rm = TRUE)
+    },
+    .groups = "drop"
+  )
+
+# ------------------------------------------------------------
+# 7. Define sample order
+# ------------------------------------------------------------
+sample_levels <- master2 %>%
+  distinct(sample_id) %>%
+  arrange(sample_id) %>%
+  pull(sample_id)
+
+# ------------------------------------------------------------
+# 8. Define iteration order
+# ------------------------------------------------------------
+# Numeric ordering where possible
+iteration_levels <- master2 %>%
+  distinct(strainGE_iterations) %>%
+  mutate(iteration_numeric = suppressWarnings(
+    as.numeric(as.character(strainGE_iterations))
+  )) %>%
+  arrange(iteration_numeric, strainGE_iterations) %>%
+  pull(strainGE_iterations) %>%
+  as.character()
+
+# ------------------------------------------------------------
+# 9. Define strain stacking / legend order
+# ------------------------------------------------------------
+strain_levels <- c(
+  "Other",
+  "PMV-1",
+  "IHE3034",
+  "SF-468",
+  "D8",
+  "STEC299",
+  "AR_0081",
+  "SC516",
+  "AR437",
+  "RM12579",
+  "AR_0077"
+)
+
+# ------------------------------------------------------------
+# 10. Apply factor levels
+# ------------------------------------------------------------
+plot_data <- plot_data %>%
+  mutate(
+    sample_id = factor(
+      sample_id,
+      levels = sample_levels),
+    strainGE_iterations = factor(
+      as.character(strainGE_iterations),
+      levels = iteration_levels),
+    strain_category = factor(
+      strain_category,
+      levels = strain_levels
+    )
+  )
+
+# ------------------------------------------------------------
+# 11. Plot predicted relative abundances
+# One row = StrainGE iteration setting
+# One bar = metagenome sample
+# ------------------------------------------------------------
+p_strainGE_iterations <- ggplot(plot_data,
+    aes(x = sample_id,
+        y = predicted_relative_abundance,
+        fill = strain_category)) +
+  geom_col(
+    color = "black", linewidth = 0.2, width = 0.85,
+    position = position_stack(reverse = FALSE), na.rm = TRUE) +
+  geom_text(
+    aes(label = ifelse(
+      predicted_relative_abundance >= 0.1,
+      sprintf("%.2f", predicted_relative_abundance),
+      ""
+    )
+    ),
+    position = position_stack(vjust = 0.5),
+    size = 3, color = "white",
+    fontface = "bold", angle = 0, na.rm = TRUE) +
+  facet_grid(
+    rows = vars(strainGE_iterations),
+    scales = "fixed",
+    labeller = labeller(
+      strainGE_iterations = function(x) {
+        paste0(x, " iterations")
+      }
+    )
+  ) +
+  scale_fill_brewer(
+    palette = "Paired",
+    name = "<b><i>E. coli</i> strain</b><br><b>(phylogroup;</b><br><b>true abundance)</b>",
+    breaks = strain_levels,
+    labels = c(
+      "Other"   = "Other",
+      "PMV-1"   = "PMV-1 (B2-2; 0.10)",
+      "IHE3034" = "IHE3034 (B2-2; 0.10)",
+      "SF-468"  = "SF-468 (B2-2; 0.10)",
+      "D8"      = "D8 (B2-2; 0.10)",
+      "STEC299" = "STEC299 (B2-2; 0.10)",
+      "AR_0081" = "AR_0081 (B2-1; 0.20)",
+      "SC516"   = "SC516 (A; 0.12)",
+      "AR437"   = "AR437 (B1; 0.08)",
+      "RM12579" = "RM12579 (E2; 0.06)",
+      "AR_0077" = "AR_0077 (F; 0.04)"
+    )
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 1, 0.25),
+    expand = expansion(mult = c(0, 0.01))) +
+  labs(x = "Real-world spiked metagenome sample",
+       y = "Predicted relative abundance") +
+  theme_minimal(base_size = 16) +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    strip.text.y = element_text(face = "bold", size = 12, angle = 0),
+    panel.spacing = unit(0.6, "lines"),
+    legend.position = "right",
+    legend.text = element_text(size = 11),
+    legend.title = ggtext::element_markdown(size = 12, face = "bold")
+  )
+
+print(p_strainGE_iterations)
+
+# ------------------------------------------------------------
+# 12. Prepare ground-truth data
+# ------------------------------------------------------------
+ground_truth_data <- data.frame(
+  strain_category = names(true_abundances),
+  abundance = as.numeric(true_abundances))
+
+ground_truth_data <- bind_rows(
+  data.frame(
+    strain_category = "Other",
+    abundance = 0),
+  ground_truth_data)
+
+ground_truth_data <- ground_truth_data %>%
+  mutate(
+    strain_category = factor(
+      strain_category,
+      levels = strain_levels),
+    label_y = rev(
+      cumsum(rev(abundance)) - rev(abundance) / 2),
+    ground_truth_label = ifelse(
+      abundance > 0,
+      paste0(
+        as.character(strain_category),
+        ", ",
+        sprintf("%.2f", abundance)
+      ),
+      ""
+    ),
+    label_colour = ifelse(
+      strain_category == "AR_0077",
+      "black",
+      "white"
+    )
+  )
+
+# ------------------------------------------------------------
+# 13. Create vertical stacked ground-truth bar
+# ------------------------------------------------------------
+ground_truth_bar <- ggplot(
+  ground_truth_data,
+  aes(x = "Ground truth",
+      y = abundance,
+      fill = strain_category)) +
+  geom_col(width = 0.55, color = "black",
+           linewidth = 0.2, position = position_stack(reverse = FALSE)) +
+  geom_text(
+    aes(y = label_y,
+        label = ground_truth_label,
+        color = label_colour),
+    size = 3, fontface = "bold", lineheight = 0.9, show.legend = FALSE) +
+  scale_color_identity() +
+  scale_fill_brewer(
+    palette = "Paired",
+    breaks = strain_levels,
+    drop = FALSE) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    expand = expansion(mult = c(0, 0))) +
+  theme_void() +
+  theme(legend.position = "none")
+
+# ------------------------------------------------------------
+# 14. Extract strain legend
+# ------------------------------------------------------------
+strain_legend <- cowplot::get_legend(
+  p_final_benchmark_stacked +
+    theme(legend.position = "right"))
+
+# ------------------------------------------------------------
+# 15. Ground-truth label beneath bar
+# ------------------------------------------------------------
+ground_truth_label <- ggdraw() +
+  draw_label(
+    "Ground truth \n(expected \nproportions)",
+    fontface = "bold", size = 10, x = 0.5, y = 0.25)
+
+ground_truth_panel <- plot_grid(
+  ground_truth_bar,
+  ground_truth_label,
+  ncol = 1,
+  rel_heights = c(1, 0.15))
+
+# ------------------------------------------------------------
+# 16. Combine legend and ground-truth bar
+# ------------------------------------------------------------
+right_hand_panel <- ggdraw() +
+  draw_plot(
+    strain_legend,
+    x = 0, y = 0.45, width = 1, height = 0.55) +
+  draw_plot(
+    ground_truth_panel,
+    x = 0.1, y = 0.225, width = 0.7, height = 0.30)
+
+# ------------------------------------------------------------
+# 17. Combine main plot with custom legend
+# ------------------------------------------------------------
+p_strainGE_with_ground_truth <- plot_grid(
+  p_final_benchmark_stacked +
+    theme(legend.position = "none"),
+  right_hand_panel,
+  ncol = 2,
+  rel_widths = c(1, 0.18))
+
+print(p_strainGE_with_ground_truth)
+
+# ------------------------------------------------------------
+# 18. Save final figure
+# ------------------------------------------------------------
+ggsave("Fig.S5.pdf",plot = p_strainGE_with_ground_truth, width = 18, height = 12)
